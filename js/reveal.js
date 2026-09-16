@@ -1,6 +1,9 @@
 /* India Recycles - reveal on scroll.
-   Sections ease up and fade in as they enter the viewport, so scrolling feels
-   smooth and intentional rather than everything being fully painted at once.
+   As each section enters the viewport its content eases up and fades in - not the
+   whole block at once, but its pieces in quick succession (heading, then cards,
+   then the rest) so scrolling feels smooth and the page reveals itself. Anything
+   already on screen at load stays visible, so the hero never flashes and the LCP
+   is never delayed. Everything degrades to fully-visible if JS or IO is missing.
    Disabled entirely for anyone who prefers reduced motion. */
 (function () {
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -12,6 +15,19 @@
       .filter(function (s) { return !s.closest('nav') && !s.querySelector('nav'); });
   }
 
+  // Most sections wrap all their content in a single centred container
+  // (<section><div class="max-w-6xl">…</div></section>). Descend through those
+  // single-child wrappers so the stagger applies to the real content rows
+  // (heading, grid, cards) rather than to one lone wrapper. Bail out to the
+  // section itself if there is no obvious multi-child content root.
+  function staggerRoot(section) {
+    var node = section, guard = 0;
+    while (node && node.children && node.children.length === 1 && guard++ < 4) {
+      node = node.children[0];
+    }
+    return (node && node.children && node.children.length > 1) ? node : null;
+  }
+
   function start() {
     var sections = collect();
     if (!sections.length) return;
@@ -19,17 +35,20 @@
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('ir-reveal-in'); io.unobserve(e.target); }
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: 0.05, rootMargin: '0px 0px -6% 0px' });
 
-    sections.forEach(function (s, i) {
+    sections.forEach(function (s) {
       var r = s.getBoundingClientRect();
       // Anything already on screen at load stays visible - never hide the hero.
       if (r.top < window.innerHeight * 0.92) { s.classList.add('ir-reveal-in'); return; }
       s.classList.add('ir-reveal');
+      var root = staggerRoot(s);
+      if (root) root.classList.add('ir-stagger');
       io.observe(s);
     });
 
-    // Safety net: if a section never triggers (print, odd layouts), reveal after 3s.
+    // Safety net: if a section never triggers (print, odd layouts, CMS rebuilds),
+    // reveal everything still pending after 3s so no content is ever left hidden.
     setTimeout(function () {
       document.querySelectorAll('.ir-reveal:not(.ir-reveal-in)').forEach(function (s) {
         s.classList.add('ir-reveal-in');

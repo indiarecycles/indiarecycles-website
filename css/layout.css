@@ -342,14 +342,53 @@ section[id] { scroll-margin-top: 96px; }
   section[class*="pt-[84px]"] { padding-top: 84px !important; }
 }
 
-/* ── Reveal on scroll ── */
-.ir-reveal { opacity: 0; transform: translateY(26px); }
+/* ── Reveal on scroll ──
+   The section itself only fades in gently; its content rows carry the upward
+   "rise" and come in staggered (see .ir-stagger below) so the page reveals
+   itself piece by piece rather than popping in as one block. Both states are
+   applied by js/reveal.js only for off-screen sections, so if the JS/observer
+   is absent everything simply stays visible. */
+.ir-reveal { opacity: 0; }
 .ir-reveal-in {
-  opacity: 1; transform: none;
-  transition: opacity .6s cubic-bezier(.22,.61,.36,1), transform .6s cubic-bezier(.22,.61,.36,1);
+  opacity: 1;
+  transition: opacity .5s ease;
 }
+
+/* Staggered content rise. reveal.js tags the section's real content container
+   with .ir-stagger (which may be a descendant of, or the section element
+   itself); its direct children rise + fade in sequence. The :is() list covers
+   both cases. */
+:is(.ir-reveal .ir-stagger, .ir-reveal.ir-stagger) > * {
+  opacity: 0;
+  transform: translateY(22px);
+  will-change: opacity, transform;
+}
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity .62s cubic-bezier(.22,.61,.36,1), transform .62s cubic-bezier(.22,.61,.36,1);
+  will-change: auto;
+}
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > *:nth-child(2) { transition-delay: .07s; }
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > *:nth-child(3) { transition-delay: .14s; }
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > *:nth-child(4) { transition-delay: .20s; }
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > *:nth-child(5) { transition-delay: .26s; }
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > *:nth-child(6) { transition-delay: .31s; }
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > *:nth-child(7) { transition-delay: .36s; }
+:is(.ir-reveal-in .ir-stagger, .ir-reveal-in.ir-stagger) > *:nth-child(n+8) { transition-delay: .40s; }
+
+/* Sections with no content wrapper to stagger fall back to rising as one block. */
+.ir-reveal:not(.ir-stagger):not(:has(.ir-stagger)) { transform: translateY(22px); }
+.ir-reveal-in:not(.ir-stagger):not(:has(.ir-stagger)) {
+  transform: none;
+  transition: opacity .5s ease, transform .62s cubic-bezier(.22,.61,.36,1);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ir-reveal, .ir-reveal-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .ir-reveal, .ir-reveal-in,
+  .ir-reveal .ir-stagger > *, .ir-reveal-in .ir-stagger > * {
+    opacity: 1 !important; transform: none !important; transition: none !important;
+  }
 }
 
 /* ── Flash announcement: side tab + popup ──
