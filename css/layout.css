@@ -151,7 +151,7 @@ section[id] { scroll-margin-top: 96px; }
    The photo gets a taller 4:3 frame flush to the card edges (no inner bezel) and
    is shown uncropped; the text sits on its own solid panel that stretches to a
    common height, so copy never reads as part of the picture. */
-.model-card-media { aspect-ratio: 4 / 3; background: #f2f7f4; position: relative; }
+.model-card-media { aspect-ratio: 16 / 9; background: #f2f7f4; position: relative; }
 .model-card-body { background: #ffffff; }
 @media (max-width: 640px) {
   .model-card-media { aspect-ratio: 16 / 10; }
