@@ -29,8 +29,16 @@
     function wire() {
       document.querySelectorAll('form[data-collect]').forEach(function (form) {
         if (form.__irWired) return; form.__irWired = true;
-        form.addEventListener('submit', function () {
+        form.addEventListener('submit', function (ev) {
           if (form.querySelector('[name="_honey"]') && form.querySelector('[name="_honey"]').value) return;
+          // One send per page view: the FormSubmit redirect can take a few seconds, and
+          // visitors who click again were creating duplicate inbox rows + emails.
+          if (form.__irSent) { ev.preventDefault(); return; }
+          form.__irSent = true;
+          form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (b) {
+            b.disabled = true; b.style.opacity = '.6'; b.style.cursor = 'wait';
+            if (b.tagName === 'BUTTON') { b.__irLabel = b.innerHTML; b.textContent = 'Sending…'; }
+          });
           var data = {};
           new FormData(form).forEach(function (v, k) {
             if (k.charAt(0) !== '_' && typeof v === 'string' && v.trim()) data[k] = v.trim();
@@ -49,6 +57,20 @@
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
     else wire();
+    // Coming back with the Back button (bfcache) restores the page as it was: re-arm
+    // the form so a genuinely new request can be sent. The database still drops exact
+    // repeats within 30 minutes.
+    window.addEventListener('pageshow', function (e) {
+      if (!e.persisted) return;
+      document.querySelectorAll('form[data-collect]').forEach(function (form) {
+        form.__irSent = false;
+        form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (b) {
+          b.disabled = false; b.style.opacity = ''; b.style.cursor = '';
+          if (b.__irLabel != null) b.innerHTML = b.__irLabel;
+        });
+        document.dispatchEvent(new CustomEvent('ir:form-rearm', { detail: form }));
+      });
+    });
   })();
   var FOUNDED_MS = new Date(2017, 0, 1).getTime();
 

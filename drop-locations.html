@@ -1227,7 +1227,7 @@
   });
 </script>
 
-<script src="js/cms.js?v=56"></script>
+<script src="js/cms.js?v=57"></script>
 <script src="js/reveal.js?v=5" defer></script>
 <script src="js/gallery.js?v=4"></script>
 <script>
@@ -1437,7 +1437,17 @@ IR_CMS.then(function (c) {
     if (ackBox) ackBox.addEventListener('change', syncAck);
     function openModal() { if (ackBox) ackBox.checked = false; syncAck(); modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
     function closeModal() { modal.style.display = 'none'; document.body.style.overflow = ''; }
+    var bookLabel = openBtn.innerHTML;
+    function setSending(on) {
+      openBtn.disabled = on;
+      openBtn.style.opacity = on ? '.6' : '';
+      openBtn.style.cursor = on ? 'wait' : '';
+      openBtn.innerHTML = on ? 'Sending your request…' : bookLabel;
+    }
+    // Back button (bfcache) brings the page back mid-send: let them book again.
+    document.addEventListener('ir:form-rearm', function (e) { if (e.detail === form) setSending(false); });
     openBtn.addEventListener('click', function () {
+      if (openBtn.disabled) return;
       if (form.checkValidity()) openModal();
       else form.reportValidity();
     });
@@ -1446,6 +1456,8 @@ IR_CMS.then(function (c) {
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.style.display !== 'none') closeModal(); });
     confirmBtn.addEventListener('click', function () {
       closeModal();
+      if (openBtn.disabled) return;
+      setSending(true);
       if (typeof form.requestSubmit === 'function') { form.requestSubmit(); }
       else { var b = document.createElement('button'); b.type = 'submit'; b.style.display = 'none'; form.appendChild(b); b.click(); form.removeChild(b); }
     });
