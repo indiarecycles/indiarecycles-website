@@ -385,6 +385,58 @@ Today, India Recycles operates across Ahmedabad and Vadodara with 20+ drop locat
           <span class="block text-xs text-forest-500 mt-1 leading-relaxed">Shows a &ldquo;Request a Pickup&rdquo; form on the Drop Locations page so people who cannot reach a drop point can ask for a collection. Turn it off any time and the form disappears from the website.</span>
         </span>
       </label>
+
+      <!-- Pickup confirmation popup text - saved as settings.pickup_popup -->
+      <div class="border-t border-forest-100 mt-6 pt-5">
+        <h3 class="font-semibold text-forest-800 text-sm">&ldquo;Confirm your pickup&rdquo; popup</h3>
+        <p class="text-xs text-forest-500 mt-1 mb-4 leading-relaxed">The popup people see after pressing Book Pickup. The pickup charges also show on the Thank You page after booking. For lists, put one item per line. Wrap words in **double stars** to make them bold, like **₹50**. Press Save above to publish.</p>
+        <div class="space-y-4">
+          <div>
+            <label for="pp-title" class="block text-xs font-semibold text-forest-700 mb-1.5">Heading</label>
+            <input type="text" id="pp-title" value="Confirm your pickup" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream"/>
+          </div>
+          <div>
+            <label for="pp-intro" class="block text-xs font-semibold text-forest-700 mb-1.5">Short line under the heading</label>
+            <textarea id="pp-intro" rows="2" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream resize-none">A small pickup charge applies, and please pack only clean, usable items.</textarea>
+          </div>
+          <div>
+            <label for="pp-charge-title" class="block text-xs font-semibold text-forest-700 mb-1.5">Charges box title</label>
+            <input type="text" id="pp-charge-title" value="Pickup charge" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream"/>
+          </div>
+          <div>
+            <label for="pp-charges" class="block text-xs font-semibold text-forest-700 mb-1.5">Pickup charges (one per line)</label>
+            <textarea id="pp-charges" rows="3" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream resize-y">Within Ahmedabad, up to 5 km: **₹50**
+Within Ahmedabad, above 5 km: **₹100**
+Outside Ahmedabad: team will confirm before pickup.</textarea>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="pp-pack-title" class="block text-xs font-semibold text-forest-700 mb-1.5">Green box title</label>
+              <input type="text" id="pp-pack-title" value="Please pack" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream mb-2"/>
+              <label for="pp-pack" class="block text-xs font-semibold text-forest-700 mb-1.5">Green box items (one per line)</label>
+              <textarea id="pp-pack" rows="4" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream resize-y">Clean, wearable clothes
+Usable shoes &amp; bags
+Bedsheets &amp; linen</textarea>
+            </div>
+            <div>
+              <label for="pp-avoid-title" class="block text-xs font-semibold text-forest-700 mb-1.5">Red box title</label>
+              <input type="text" id="pp-avoid-title" value="Please avoid" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream mb-2"/>
+              <label for="pp-avoid" class="block text-xs font-semibold text-forest-700 mb-1.5">Red box items (one per line)</label>
+              <textarea id="pp-avoid" rows="4" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream resize-y">Torn or stained
+Wet or smelly
+Not usable</textarea>
+            </div>
+          </div>
+          <div>
+            <label for="pp-agree" class="block text-xs font-semibold text-forest-700 mb-1.5">Checkbox sentence</label>
+            <textarea id="pp-agree" rows="2" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream resize-none">I confirm my items are **clean and usable**, and I agree to the pickup charge above.</textarea>
+          </div>
+          <div>
+            <label for="pp-button" class="block text-xs font-semibold text-forest-700 mb-1.5">Confirm button text</label>
+            <input type="text" id="pp-button" value="Confirm &amp; Book Pickup" class="w-full px-3 py-2.5 rounded-xl border border-forest-200 text-sm text-forest-800 bg-cream"/>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1222,6 +1274,21 @@ Today, India Recycles operates across Ahmedabad and Vadodara with 20+ drop locat
     }).filter(l => l.name);
   }
 
+  // Pickup confirmation popup text (Drop Locations tab) - lives inside the settings section
+  const PP_TEXT = { title: 'pp-title', intro: 'pp-intro', charge_title: 'pp-charge-title', pack_title: 'pp-pack-title', avoid_title: 'pp-avoid-title', agree: 'pp-agree', button: 'pp-button' };
+  const PP_LIST = { charges: 'pp-charges', pack: 'pp-pack', avoid: 'pp-avoid' };
+  function collectPickupPopup() {
+    const out = {};
+    Object.keys(PP_TEXT).forEach(k => { out[k] = (document.getElementById(PP_TEXT[k]).value || '').trim(); });
+    Object.keys(PP_LIST).forEach(k => { out[k] = (document.getElementById(PP_LIST[k]).value || '').split('\n').map(x => x.trim()).filter(Boolean); });
+    return out;
+  }
+  function loadPickupPopup(pp) {
+    if (!pp || typeof pp !== 'object') return;
+    Object.keys(PP_TEXT).forEach(k => { if (pp[k]) document.getElementById(PP_TEXT[k]).value = pp[k]; });
+    Object.keys(PP_LIST).forEach(k => { if (Array.isArray(pp[k]) && pp[k].length) document.getElementById(PP_LIST[k]).value = pp[k].join('\n'); });
+  }
+
   function collectSection(section) {
     if (section === 'locations') {
       return { ahm: collectCards('ahm-locations'), vad: collectCards('vad-locations') };
@@ -1477,7 +1544,7 @@ Today, India Recycles operates across Ahmedabad and Vadodara with 20+ drop locat
       return { items: vds };
     }
     if (section === 'settings') {
-      return { pickup_enabled: document.getElementById('set-pickup').checked, notify_email: (document.getElementById('set-notify').value || '').trim(), sticky_cta: document.getElementById('set-cta').value, sticky_cta2: document.getElementById('set-cta2').value };
+      return { pickup_enabled: document.getElementById('set-pickup').checked, notify_email: (document.getElementById('set-notify').value || '').trim(), sticky_cta: document.getElementById('set-cta').value, sticky_cta2: document.getElementById('set-cta2').value, pickup_popup: collectPickupPopup() };
     }
     if (section === 'stats') {
       const out = {};
@@ -1745,7 +1812,7 @@ Today, India Recycles operates across Ahmedabad and Vadodara with 20+ drop locat
       if (cms.models && Array.isArray(cms.models.items)) renderModelsList(cms.models.items);
       if (cms.videos && Array.isArray(cms.videos.items)) renderVideos(cms.videos.items);
       if (cms.stories && Array.isArray(cms.stories.items)) renderStoriesList(cms.stories.items);
-      if (cms.settings) { document.getElementById('set-pickup').checked = cms.settings.pickup_enabled !== false; if (cms.settings.notify_email) document.getElementById('set-notify').value = cms.settings.notify_email; if (cms.settings.sticky_cta) document.getElementById('set-cta').value = cms.settings.sticky_cta; if (cms.settings.sticky_cta2) document.getElementById('set-cta2').value = cms.settings.sticky_cta2; }
+      if (cms.settings) { document.getElementById('set-pickup').checked = cms.settings.pickup_enabled !== false; if (cms.settings.notify_email) document.getElementById('set-notify').value = cms.settings.notify_email; if (cms.settings.sticky_cta) document.getElementById('set-cta').value = cms.settings.sticky_cta; if (cms.settings.sticky_cta2) document.getElementById('set-cta2').value = cms.settings.sticky_cta2; loadPickupPopup(cms.settings.pickup_popup); }
       if (cms.images && typeof cms.images === 'object') {
         imageOverrides = Object.assign({}, cms.images);
         renderGallery();

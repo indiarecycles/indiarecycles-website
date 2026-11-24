@@ -1275,6 +1275,45 @@
         el.style.display = pickupOn ? '' : 'none';
       });
 
+      /* Pickup confirmation popup text + charges (settings.pickup_popup), edited in
+         admin > Drop Locations. The charges also fill the Thank You page. Empty
+         fields keep the static HTML. **word** renders bold. */
+      (function () {
+        var pp = content.settings && content.settings.pickup_popup;
+        if (!pp || typeof pp !== 'object') return;
+        function rich(t) {
+          var d = document.createElement('div'); d.textContent = String(t);
+          return d.innerHTML.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        }
+        function lines(v) {
+          return (Array.isArray(v) ? v : String(v || '').split('\n'))
+            .map(function (x) { return String(x).trim(); }).filter(Boolean);
+        }
+        function setText(id, v) {
+          var el = document.getElementById(id);
+          if (el && v && String(v).trim()) el.innerHTML = rich(String(v).trim());
+        }
+        function setList(id, v) {
+          var el = document.getElementById(id), items = lines(v);
+          if (!el || !items.length) return;
+          var mark = el.getAttribute('data-mark');
+          var pre = mark === 'ok' ? '<span style="color:#16a34a;font-weight:800;">&#10003;</span> '
+                  : mark === 'no' ? '<span style="color:#dc2626;font-weight:800;">&#10007;</span> ' : '';
+          el.innerHTML = items.map(function (x) { return '<li>' + pre + rich(x) + '</li>'; }).join('');
+        }
+        setText('pk-modal-title', pp.title);
+        setText('pk-intro', pp.intro);
+        setText('pk-charge-title', pp.charge_title);
+        setList('pk-charges', pp.charges);
+        setList('ty-pickup-charges', pp.charges);
+        setText('pk-pack-title', pp.pack_title);
+        setList('pk-pack', pp.pack);
+        setText('pk-avoid-title', pp.avoid_title);
+        setList('pk-avoid', pp.avoid);
+        setText('pk-agree', pp.agree);
+        setText('pk-confirm', pp.button);
+      })();
+
       /* Stories / blog: the index (stories.html #cms-stories-list) shows posts added
          from the admin; the single-post view (story.html) renders one post by ?slug=.
          Static story-*.html pages are separate and carry their own SEO markup. */

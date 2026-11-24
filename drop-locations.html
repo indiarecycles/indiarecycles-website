@@ -1072,10 +1072,10 @@
   <div id="pk-modal" role="dialog" aria-modal="true" aria-labelledby="pk-modal-title" style="position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(20,40,30,0.55);">
     <div style="background:#fff;border-radius:20px;max-width:470px;width:100%;padding:24px 22px;box-shadow:0 24px 60px rgba(0,0,0,0.28);max-height:90vh;overflow-y:auto;">
       <h3 id="pk-modal-title" style="font-size:1.3rem;font-weight:600;color:#1a1a1a;margin-bottom:4px;">Confirm your pickup</h3>
-      <p style="color:#6b6b6b;font-size:13.5px;line-height:1.55;margin-bottom:14px;">A small pickup charge applies, and please pack only clean, usable items.</p>
+      <p id="pk-intro" style="color:#6b6b6b;font-size:13.5px;line-height:1.55;margin-bottom:14px;">A small pickup charge applies, and please pack only clean, usable items.</p>
       <div style="background:#f2f7f4;border:1px solid #cfe4d7;border-radius:14px;padding:12px 15px;margin-bottom:14px;">
-        <div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#256b49;margin-bottom:5px;">Pickup charge</div>
-        <ul style="margin:0;padding-left:17px;color:#3f5a4a;font-size:13px;line-height:1.8;">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#256b49;margin-bottom:5px;" id="pk-charge-title">Pickup charge</div>
+        <ul id="pk-charges" style="margin:0;padding-left:17px;color:#3f5a4a;font-size:13px;line-height:1.8;">
           <li>Within Ahmedabad, up to 5 km: <strong>₹50</strong></li>
           <li>Within Ahmedabad, above 5 km: <strong>₹100</strong></li>
           <li>Outside Ahmedabad: team will confirm before pickup.</li>
@@ -1084,16 +1084,16 @@
       <!-- What to donate / what not to - compact visual guide -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
         <div style="background:#f0faf3;border:1px solid #c9e9d6;border-radius:12px;padding:11px 12px;">
-          <div style="font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#15803d;margin-bottom:7px;">Please pack</div>
-          <ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:#2f5540;line-height:1.75;">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#15803d;margin-bottom:7px;" id="pk-pack-title">Please pack</div>
+          <ul id="pk-pack" data-mark="ok" style="list-style:none;margin:0;padding:0;font-size:12.5px;color:#2f5540;line-height:1.75;">
             <li><span style="color:#16a34a;font-weight:800;">&#10003;</span> Clean, wearable clothes</li>
             <li><span style="color:#16a34a;font-weight:800;">&#10003;</span> Usable shoes &amp; bags</li>
             <li><span style="color:#16a34a;font-weight:800;">&#10003;</span> Bedsheets &amp; linen</li>
           </ul>
         </div>
         <div style="background:#fef3f2;border:1px solid #f4cfca;border-radius:12px;padding:11px 12px;">
-          <div style="font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#b91c1c;margin-bottom:7px;">Please avoid</div>
-          <ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:#8a3b34;line-height:1.75;">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#b91c1c;margin-bottom:7px;" id="pk-avoid-title">Please avoid</div>
+          <ul id="pk-avoid" data-mark="no" style="list-style:none;margin:0;padding:0;font-size:12.5px;color:#8a3b34;line-height:1.75;">
             <li><span style="color:#dc2626;font-weight:800;">&#10007;</span> Torn or stained</li>
             <li><span style="color:#dc2626;font-weight:800;">&#10007;</span> Wet or smelly</li>
             <li><span style="color:#dc2626;font-weight:800;">&#10007;</span> Not usable</li>
@@ -1102,7 +1102,7 @@
       </div>
       <label for="pk-ack" style="display:flex;gap:9px;align-items:flex-start;background:#f2f7f4;border:1px solid #cfe4d7;border-radius:12px;padding:11px 13px;margin-bottom:18px;cursor:pointer;">
         <input type="checkbox" id="pk-ack" style="width:17px;height:17px;margin-top:1px;accent-color:#1c5439;cursor:pointer;flex-shrink:0;"/>
-        <span style="font-size:13px;color:#3f5a4a;line-height:1.5;">I confirm my items are <strong>clean and usable</strong>, and I agree to the pickup charge above.</span>
+        <span id="pk-agree" style="font-size:13px;color:#3f5a4a;line-height:1.5;">I confirm my items are <strong>clean and usable</strong>, and I agree to the pickup charge above.</span>
       </label>
       <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;">
         <button type="button" id="pk-cancel" style="border:1.5px solid rgba(0,0,0,0.14);background:#fff;color:#1a1a1a;padding:10px 20px;border-radius:9999px;font-size:14px;font-weight:500;cursor:pointer;">Cancel</button>
@@ -1227,7 +1227,7 @@
   });
 </script>
 
-<script src="js/cms.js?v=57"></script>
+<script src="js/cms.js?v=58"></script>
 <script src="js/reveal.js?v=5" defer></script>
 <script src="js/gallery.js?v=4"></script>
 <script>
